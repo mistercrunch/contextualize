@@ -1,134 +1,319 @@
-# Context is Everything!
+# Contextualize
 
-## An essay on the fundamentals of context engineering
+**A framework for structured, active context engineering built on Claude Code**
 
-## On the Nature of Context
+## What is Contextualize?
 
-### Context is Everything
+Contextualize extends Claude Code with three core capabilities:
 
-In any complex system, context is the invisible substrate that makes understanding possible. It's not just information—it's the relationships between information, the history that shaped it, the constraints that bound it, and the intentions that drive it.
+1. **Structured Context Organization** - Organize your project knowledge as a collection of interconnected concept files, not monolithic documentation
+2. **Subtask-Oriented Execution** - Each spawned task gets precisely the context it needs, nothing more, nothing less
+3. **Active Session Management** - Wraps Claude's subtasks in a framework that enables task isolation, introspection, persistence, and multi-session orchestration
 
-Context is:
-- **Applicable knowledge**: Information becomes context when it can be applied to understand or change something
-- **Multi-dimensional**: The same information serves different purposes from different perspectives
-- **Self-referential**: Context contains meta-context—information about how to interpret information
-- **Emergent**: The whole exceeds its parts; context creates meaning through interaction
+## The Problem
 
-### The Paradox of Context
+Claude Code is powerful, but operates with significant limitations:
 
-Context is simultaneously:
-- Universal (everyone needs it) yet particular (everyone needs different parts)
-- Implicit (assumed knowledge) yet explicit (must be communicated)
-- Stable (conventions persist) yet dynamic (understanding evolves)
-- Structured (follows patterns) yet organic (resists rigid classification)
+### The Context Segmentation Dilemma
+Power users have discovered that **context segmentation is key** to getting great results from Claude. Using the `Task` tool or subagents to manage context more actively can be powerful—giving focused context to specific problems. But this approach comes with significant drawbacks:
+- **No persistence** - subtasks vanish when complete
+- **No observability** - can't inspect what happened
+- **No resumability** - can't pick up where you left off
+- **No relationships** - can't track task dependencies or failures
 
-## Why Context Demands Organization
+You're forced to choose: either dump everything into context (and get confused responses), or use ephemeral subtasks (and lose all your work history).
 
-### The Cost of Chaos
+### One-Size-Fits-All Context
+Without proper segmentation tools, projects rely on monolithic `CLAUDE.md` files that dump everything into context. Every task—whether fixing a typo or refactoring architecture—gets the same overwhelming context. This leads to:
+- Token waste on irrelevant information
+- Confused responses mixing unrelated concerns
+- Hallucinated imports from parts of the codebase not actually needed
 
-Without organization, context:
-- **Decays**: Knowledge erodes with time and team changes
-- **Fragments**: Understanding splits across minds, documents, and tools
-- **Repeats**: The same questions get answered again and again
-- **Diverges**: Multiple truths emerge about the same reality
+### Limited Context Management
+While Claude Code's `.claude/commands/` and `.claude/agents/` directories offer some ways to manage certain types of context, they're:
+- Limited to specific use cases (commands and agent personalities)
+- Not composable or reusable across tasks
+- Still require dumping everything into the main session
 
-### The Power of Structure
+### Context Fragmentation
+Every AI tool wants its own format:
+- `CLAUDE.md` for Claude
+- `CURSOR.md` for Cursor
+- `.aider.conf.yml` for Aider
+- `.claude/` directories aren't universal
+- No reusability across tools or sessions
 
-Organized context:
-- **Accumulates**: Knowledge builds rather than resets
-- **Transfers**: Understanding moves between people and tools
-- **Scales**: Complexity becomes navigable
-- **Converges**: Shared mental models emerge
+## How It Works
 
-## The Three Dimensions of Context
+Contextualize solves these problems through `ctx`, a **companion CLI for Claude Code** that intercepts and enhances the task workflow.
 
-Context naturally organizes along three fundamental axes:
+### High-Level Flow
 
-### 1. Subject Dimension (Perspectives)
+1. **Organize Knowledge** - Break your project context into focused concept files instead of one massive document
+2. **Launch Targeted Tasks** - Use `ctx` to spawn Claude sessions with only the concepts each task needs
+3. **Track Everything** - Every task gets logged with full input/output, creating a persistent knowledge graph
+4. **Resume & Fork** - Jump back into any session or branch from failure points
 
-Context through the lens of different disciplines and roles.
+### Architecture Comparison
 
-Each perspective asks different questions about the same system:
-- **Architecture**: How is it structured? What are the boundaries?
-- **Engineering**: How does it work? What are the patterns?
-- **Product**: What problems does it solve? For whom?
-- **Design**: How do users experience it? What mental models exist?
-- **Operations**: How does it run? What can break?
+```
+Traditional Claude:                    With Contextualize:
+┌─────────────┐                        ┌─────────────┐
+│   Main      │                        │   Main      │
+│  Session    │                        │  Session    │
+│             │                        │             │
+│ Everything  │                        │ Orchestrator│
+│ in context  │                        │    only     │
+└─────┬───────┘                        └─────┬───────┘
+      │                                      │
+      ▼                                      ▼
+┌─────────────┐                        ┌─────────────┐
+│  Subtask    │                        │  Task 1     │
+│             │                        │ ┌─────────┐ │
+│ (ephemeral) │                        │ │Concepts:│ │
+│             │                        │ │auth,api │ │
+└─────────────┘                        │ └─────────┘ │
+                                       │  Logged     │
+                                       │  Persistent │
+                                       └─────────────┘
+```
 
-This is context organized by *who needs to know*.
+### What Contextualize Provides
 
-### 2. Task Dimension (Capabilities)
+Instead of ephemeral subtasks with full context, Contextualize creates:
+- **Isolated sessions** with targeted context via `claude --session-id`
+- **Persistent task records** with full I/O logging in `logs/`
+- **Concept loading** from your `context/concepts/` knowledge base
+- **Task relationships** tracked in a visual DAG
 
-Context organized by what needs to be accomplished.
+## Key Features
 
-Knowledge clustered around action:
-- **Setup**: What's needed to begin?
-- **Development**: How to build and test?
-- **Debugging**: How to diagnose and fix?
-- **Deployment**: How to ship and monitor?
-- **Maintenance**: How to evolve and refactor?
+### 🎯 **Surgical Context Loading**
+- Load only relevant "concepts" per task
+- Self-referencing knowledge network
+- Reusable, composable context modules
 
-This is context organized by *what needs to be done*.
+### 🔀 **Multi-Session Orchestration**
+- Each task runs in its own Claude session
+- Parallel task execution without context pollution
+- Session IDs enable persistence and resumability
 
-### 3. Outcome Dimension (Artifacts)
+### 🔍 **Full Observability**
+- Track all tasks in a visual DAG
+- Complete input/output logging
+- Inspect any task's context and results
 
-Context organized around deliverables and their histories.
+### ⏮️ **Time Travel & Forking**
+- Resume any session exactly where it left off
+- Fork from any task when issues arise
+- Build on previous work without starting over
 
-The specifications, decisions, and learnings that produced results:
-- **Features**: What was built and why?
-- **Decisions**: What trade-offs were made?
-- **Experiments**: What was tried and learned?
-- **Migrations**: How did we get from there to here?
+### 🦘 **Session Hopping**
+- Jump between related tasks
+- Carry forward learned context
+- Build a living knowledge graph as you work
 
-This is context organized by *what was achieved*.
+## Quick Start
 
-## The Interplay
+### Installation
 
-These dimensions are not independent—they intersect and reinforce:
-- A **task** requires multiple **perspectives** to complete
-- An **outcome** emerges from many **tasks**
-- A **perspective** interprets multiple **outcomes**
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/contextualize.git
+cd contextualize
 
-The richness of context comes from these intersections. A testing strategy (task) viewed through architecture (perspective) that produced a test framework (outcome).
+# Install with uv (recommended)
+uv pip install -e .
 
-## The Fundamental Tension
+# Or with pip
+pip install -e .
+```
 
-### Structure vs. Emergence
+### Setup
 
-Too much structure and context becomes:
-- Rigid, unable to adapt
-- Burdensome to maintain
-- Disconnected from reality
+The `ctx` CLI works alongside `claude` as a companion tool:
 
-Too little structure and context becomes:
-- Chaotic, impossible to navigate
-- Inconsistent across sources
-- Lost in noise
+```bash
+# Step 1: Install Claude Code integration (optional but recommended)
+ctx install
+# Choose 'project' for local .claude/ or 'global' for ~/.claude/
 
-The art lies in finding the minimum viable structure that enables maximum understanding.
+# Step 2: Initialize Contextualize in your project
+ctx init
 
-## Principles for Context Engineering
+# This creates:
+# - context/concepts/ - Your reusable knowledge modules
+# - logs/ - Task history and outputs
+# - .claude/commands/ - Custom Claude commands (if project install)
+```
 
-1. **Segment, don't centralize**: Distribute context across focused, findable locations
-2. **Layer, don't choose**: Support both human narrative and machine parsing
-3. **Preserve, don't discard**: Today's implementation detail is tomorrow's crucial history
-4. **Connect, don't isolate**: Context gains meaning through relationships
-5. **Evolve, don't redesign**: Systems that grow beat systems that restart
+### Basic Usage
 
-## The Vision
+```bash
+# Initialize project
+ctx init
 
-Context engineering is the discipline of making implicit knowledge explicit, scattered knowledge organized, and tribal knowledge universal.
+# Manage concepts
+ctx concept list                    # List all concepts
+ctx concept new auth                # Create new concept
+ctx concept show auth                # View concept content
 
-It's not about creating more documentation. It's about creating the right knowledge, in the right place, at the right time, for the right audience—human or machine.
+# Manage tasks
+ctx task start "Fix OAuth bug" -c auth,debugging
+ctx task list                       # View recent tasks
+ctx task show <id>                  # Inspect task details
+ctx task resume <id>                # Resume session
+ctx task fork <id> "Try new approach"  # Fork from task
 
-When context is engineered well:
-- Questions have homes
-- Knowledge has structure
-- Understanding has paths
-- Systems become learnable
+# Check status
+ctx status                          # Overall project status
+ctx task status                     # All task statuses
+```
 
-This is the future we're building: codebases that explain themselves, to everyone who asks.
+## Core Concepts
+
+### Concepts
+Reusable knowledge modules in `context/concepts/`. Each concept is a markdown file with frontmatter:
+
+```markdown
+---
+name: auth
+references: [core, oauth]
+---
+
+# Authentication Concepts
+
+## OAuth Flow
+- Token refresh mechanism
+- Error handling patterns
+- Security considerations
+```
+
+### Tasks
+Every substantial piece of work becomes a tracked task with:
+- Unique ID and session
+- Isolated context (only needed concepts)
+- Full input/output logging
+- Parent relationships (for forks)
+
+### DAG (Directed Acyclic Graph)
+Visual representation of task relationships showing:
+- Task dependencies
+- Fork points
+- Success/failure status
+- Execution timeline
+
+## Philosophy
+
+> "Context is everything, but everything is not context."
+
+Traditional AI coding assistants fail because they try to understand everything at once. Contextualize embraces the opposite: give AI agents **exactly what they need** for each specific task.
+
+This isn't just about managing files - it's about structuring knowledge for optimal AI consumption. By treating context as a carefully curated network rather than a document dump, we enable AI to work with precision instead of confusion.
+
+## Example Workflow
+
+```bash
+# 1. Initialize your project
+ctx init
+
+# 2. Create a concept for your authentication system
+ctx concept new auth
+# Edit context/concepts/auth.md with your auth docs
+
+# 3. Start a focused task
+ctx task start "Implement token refresh rotation" -c auth,testing
+
+# 4. Task runs in isolated Claude session
+# Output: Task 8f3d2a created
+
+# 5. Check progress
+ctx task show 8f3d
+
+# 6. If it fails, fork and retry
+ctx task fork 8f3d "Fix import error and retry"
+
+# 7. Resume later
+ctx task resume 8f3d
+```
+
+## Advanced Features
+
+### Async Task Execution
+Run tasks in background while continuing work:
+```bash
+ctx launch-async --desc "Generate test suite" --concepts "testing"
+```
+
+### Web-based DAG Visualization
+```bash
+python -m contextualize.dag_visualizer serve
+# Opens browser with interactive DAG viewer
+```
+
+### Dogfooding Mode
+Let Contextualize build itself:
+```bash
+ctx dogfood
+# Launches Claude with context about the framework
+```
+
+## Project Status
+
+**⚠️ Proof of Concept**
+
+This is an early POC demonstrating active context engineering. Expect rough edges and breaking changes.
+
+### Working Features ✅
+- Basic task launching and tracking
+- Concept organization and loading
+- DAG visualization
+- Session fork and resume
+- CLI interface
+
+### In Development 🚧
+- Full MCP server integration
+- Better async execution
+- Concept auto-discovery
+- Cloud persistence
+- Multi-agent coordination
+
+## Project Goals
+
+### Immediate: Empower Claude Code Users
+Enable Claude Code power users to take context engineering to the next level through:
+- **Better context management** - Move beyond monolithic CLAUDE.md files
+- **Active session orchestration** - Control multiple focused sessions instead of one bloated context
+- **Full observability** - See what your AI agents are actually doing
+- **Knowledge persistence** - Build on previous work instead of starting fresh
+
+### Long-term: Inspire Native Implementation
+This project serves as a **proof of concept** for enhanced workflows that could inspire the Claude Code team to implement these concepts natively:
+- Demonstrate the value of context segmentation
+- Prove that session persistence improves productivity
+- Show how task relationships enable better debugging
+- Validate that targeted context leads to better AI performance
+
+If these patterns gain traction and prove valuable to the community, they could influence the future direction of Claude Code itself.
+
+## Contributing
+
+We're exploring the future of AI-assisted development. If you're a Claude Code power user who's felt the pain of context management, we'd love your input:
+- Share your workflows and pain points
+- Contribute concepts and patterns
+- Help test and refine the framework
+- Spread the word if it helps your productivity
+
+## License
+
+MIT
+
+## Links
+
+- [Blog: Context is Everything](./BLOG.md) - Philosophical foundations
+- [Framework Design](./FRAMEWORK.md) - Technical architecture
+- [Core Concepts](./context/concepts/core.md) - Framework principles
 
 ---
 
-*This manifesto defines the philosophical foundation. Implementation follows philosophy.*
+*Built with Claude, for Claude, using Claude* 🤖

@@ -1,0 +1,15 @@
+# Include package data
+include README.md
+include LICENSE
+include pyproject.toml
+
+# Include all resource files
+recursive-include contextualize/resources *.md *.json *.yaml *.yml
+
+# Include templates
+recursive-include contextualize/resources/templates *
+
+# Exclude Python cache
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store
