@@ -6,8 +6,8 @@ Claude Code CLI interface abstraction
 import json
 import subprocess
 import uuid
-from typing import Optional, List, Tuple, Dict, Any
 from pathlib import Path
+from typing import Any
 
 
 class ClaudeCLI:
@@ -41,8 +41,8 @@ class ClaudeCLI:
         original_session_id: str,
         prompt: str,
         output_format: str = "text",
-        new_session_id: Optional[str] = None,
-    ) -> Tuple[str, str]:
+        new_session_id: str | None = None,
+    ) -> tuple[str, str]:
         """Fork an existing session and execute a prompt
 
         Returns:
@@ -78,7 +78,7 @@ class ClaudeCLI:
                     new_session_id = data["session_id"]
                 elif isinstance(data, dict) and "uuid" in data:
                     new_session_id = data["uuid"]
-            except:
+            except (json.JSONDecodeError, KeyError, TypeError):
                 # Keep the generated session ID if we can't extract it
                 pass
 
@@ -111,7 +111,7 @@ class ClaudeCLI:
         return result.stdout
 
     @staticmethod
-    def parse_json_output(output: str) -> Dict[str, Any]:
+    def parse_json_output(output: str) -> dict[str, Any]:
         """Parse JSON output from Claude CLI
 
         Claude's JSON output includes metadata, extract the result
@@ -127,12 +127,11 @@ class ClaudeCLI:
             return {"content": output}
 
     @staticmethod
-    def get_session_logs(session_id: str, project_path: Path) -> Optional[List[Dict]]:
+    def get_session_logs(session_id: str, project_path: Path) -> list[dict] | None:
         """Read session logs from Claude's storage
 
         Sessions are stored in ~/.claude/projects/{encoded-path}/{session-id}.jsonl
         """
-        import os
         from pathlib import Path
 
         # Encode project path for Claude's storage
@@ -153,7 +152,7 @@ class ClaudeCLI:
         return logs
 
     @staticmethod
-    def extract_session_messages(logs: List[Dict]) -> List[Dict]:
+    def extract_session_messages(logs: list[dict]) -> list[dict]:
         """Extract user and assistant messages from session logs"""
         messages = []
         for entry in logs:

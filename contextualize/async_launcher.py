@@ -5,11 +5,10 @@ Async task launcher for background execution
 
 import asyncio
 import json
-import subprocess
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any
 
 
 class AsyncTaskLauncher:
@@ -18,14 +17,14 @@ class AsyncTaskLauncher:
     def __init__(self):
         self.logs_dir = Path("logs")
         self.logs_dir.mkdir(exist_ok=True)
-        self.running_tasks: Dict[str, asyncio.Task] = {}
+        self.running_tasks: dict[str, asyncio.Task] = {}
 
     async def launch_task(
         self,
         description: str,
         concepts: list[str],
         context_from_main: str = "",
-        parent_id: Optional[str] = None,
+        parent_id: str | None = None,
     ) -> str:
         """Launch an async task in background"""
         task_id = str(uuid.uuid4())[:8]
@@ -173,13 +172,13 @@ Complete this task independently. The session will be saved for later review."""
 
         return content
 
-    def _log_to_dag(self, entry: Dict[str, Any]):
+    def _log_to_dag(self, entry: dict[str, Any]):
         """Append to DAG log"""
         dag_file = self.logs_dir / "dag.jsonl"
         with open(dag_file, "a") as f:
             f.write(json.dumps(entry) + "\n")
 
-    async def get_status(self, task_id: str) -> Dict[str, Any]:
+    async def get_status(self, task_id: str) -> dict[str, Any]:
         """Get task status"""
         task_dir = self.logs_dir / task_id
         metadata_file = task_dir / "metadata.json"
@@ -203,7 +202,7 @@ Complete this task independently. The session will be saved for later review."""
 
         return metadata
 
-    async def wait_for_task(self, task_id: str) -> Dict[str, Any]:
+    async def wait_for_task(self, task_id: str) -> dict[str, Any]:
         """Wait for task completion"""
         if task_id in self.running_tasks:
             await self.running_tasks[task_id]

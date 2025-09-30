@@ -5,15 +5,11 @@ Contextualize CLI - Clean, focused version with working commands only
 
 import json
 import subprocess
-import uuid
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
 from rich.table import Table
-from rich.tree import Tree
 
 app = typer.Typer(
     name="ctx",
@@ -193,7 +189,7 @@ def inspect(task_id: str):
     if output_file.exists():
         output = output_file.read_text()
         if output.strip():
-            console.print(f"\n[bold]Output:[/bold]")
+            console.print("\n[bold]Output:[/bold]")
             console.print(output[:500] + ("..." if len(output) > 500 else ""))
 
     # Show commands
@@ -267,10 +263,12 @@ def fork(
         parent_context = input_data.get("context_from_main", "")
 
     # Launch new task with parent's concepts
+    parent_desc = parent_metadata.get("description", "Unknown")
+    fork_context = f"Forked from: {parent_desc}\n{parent_context}"
     task_id = launch_task(
         description=f"[Fork of {parent_id[:8]}] {description}",
         concepts=parent_metadata.get("concepts", []),
-        context_from_main=f"Forked from: {parent_metadata.get('description', 'Unknown')}\n{parent_context}",
+        context_from_main=fork_context,
         parent_id=parent_id,
         background=False,
     )
@@ -283,7 +281,7 @@ def fork(
 
 @app.command()
 def concepts(
-    show: Optional[str] = typer.Argument(None, help="Concept name to display"),
+    show: str | None = typer.Argument(None, help="Concept name to display"),
 ):
     """List or display concepts"""
     concepts_dir = Path("context/concepts")

@@ -3,12 +3,8 @@
 Contextualize CLI v2 - Using subcommand pattern
 """
 
-import json
 import subprocess
-import uuid
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 try:
     from importlib import resources
@@ -193,21 +189,21 @@ def task_show(
     task_output = task.get_output()
     if task_output and task_output.strip():
         if output or len(task_output) < 1000:
-            console.print(f"\n[bold]Output:[/bold]")
+            console.print("\n[bold]Output:[/bold]")
             console.print(task_output)
         else:
             console.print(f"\n[bold]Output:[/bold] ({len(task_output)} chars)")
             console.print(task_output[:500] + "...")
-            console.print(f"\n[dim]Use --output to see full output[/dim]")
+            console.print("\n[dim]Use --output to see full output[/dim]")
 
     # Show error if exists
     error = task.get_error()
     if error and error.strip():
-        console.print(f"\n[bold red]Error:[/bold red]")
+        console.print("\n[bold red]Error:[/bold red]")
         console.print(error[:500] + ("..." if len(error) > 500 else ""))
 
     # Show available actions
-    console.print(f"\n[dim]Actions:[/dim]")
+    console.print("\n[dim]Actions:[/dim]")
     console.print(f"  ctx task resume {task.task_id[:8]}")
     console.print(f"  ctx task fork {task.task_id[:8]} 'new description'")
     console.print(f"  ctx task rm {task.task_id[:8]}")
@@ -292,7 +288,7 @@ def task_remove(
     if collection.remove(task.task_id):
         console.print(f"[green]Removed task {task.task_id}[/green]")
     else:
-        console.print(f"[red]Failed to remove task[/red]")
+        console.print("[red]Failed to remove task[/red]")
 
 
 @task_app.command("report")
@@ -331,7 +327,7 @@ def task_report(
             console.print("\n" + "=" * 60 + "\n")
             console.print(report_path.read_text())
     else:
-        console.print(f"[red]Failed to generate report[/red]")
+        console.print("[red]Failed to generate report[/red]")
 
 
 @task_app.command("clear")
@@ -350,7 +346,7 @@ def task_clear(
         return
 
     # Show what will be cleared
-    console.print(f"[bold]Tasks to clear:[/bold]")
+    console.print("[bold]Tasks to clear:[/bold]")
     console.print(f"  Total: {stats['total']}")
     console.print(f"  Running: {stats['running']}")
     console.print(f"  Completed: {stats['completed']}")
@@ -475,7 +471,7 @@ def concept_validate():
         for ref in missing_refs:
             console.print(f"  ❌ {ref}")
 
-    console.print(f"\n[dim]Fix by creating missing concepts or updating references[/dim]")
+    console.print("\n[dim]Fix by creating missing concepts or updating references[/dim]")
 
 
 @concept_app.command("rm")
@@ -499,7 +495,7 @@ def concept_remove(
         console.print(f"[yellow]Warning: Concept '{name}' is referenced by:[/yellow]")
         for ref in referenced_by:
             console.print(f"  - {ref}")
-        confirm = typer.confirm(f"Remove anyway?")
+        confirm = typer.confirm("Remove anyway?")
         if not confirm:
             console.print("[yellow]Cancelled[/yellow]")
             return
@@ -512,7 +508,7 @@ def concept_remove(
     if collection.remove(name):
         console.print(f"[green]Removed concept: {name}[/green]")
     else:
-        console.print(f"[red]Failed to remove concept[/red]")
+        console.print("[red]Failed to remove concept[/red]")
 
 
 # ==================== TOP-LEVEL COMMANDS ====================

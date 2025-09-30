@@ -8,10 +8,8 @@ import subprocess
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import typer
-from rich import print
 from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
@@ -26,7 +24,7 @@ console = Console()
 
 @app.command()
 def start(
-    mcp_config: Optional[Path] = typer.Option(
+    mcp_config: Path | None = typer.Option(
         Path("task-framework-mcp.json"),
         "--config",
         "-c",
@@ -85,7 +83,7 @@ This will:
 4. Allow resume/fork later
 """)
 
-    console.print(f"✅ Installed command: ctx-launch")
+    console.print("✅ Installed command: ctx-launch")
 
     # Create MCP config if needed
     mcp_config = claude_dir / "mcp-servers.json"
@@ -306,7 +304,7 @@ def dag():
 
 
 @app.command()
-def concepts(show: Optional[str] = typer.Argument(None, help="Concept name to display")):
+def concepts(show: str | None = typer.Argument(None, help="Concept name to display")):
     """List or display concepts"""
     concepts_dir = Path("context/concepts")
 

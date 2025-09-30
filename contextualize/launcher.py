@@ -7,21 +7,19 @@ import json
 import subprocess
 import uuid
 from datetime import datetime
-from pathlib import Path
-from typing import Optional, List
 
-from .models import Task, TaskCollection, TaskStatus
 from .concept_models import ConceptCollection
+from .models import Task, TaskCollection, TaskStatus
 
 
 def launch_task(
     description: str,
-    concepts: List[str] = None,
+    concepts: list[str] = None,
     context_from_main: str = "",
-    parent_id: Optional[str] = None,
+    parent_id: str | None = None,
     background: bool = False,
     generate_report: bool = False,
-    report_template: Optional[str] = None,
+    report_template: str | None = None,
 ) -> str:
     """Launch a task with Claude"""
 
@@ -136,7 +134,7 @@ Please complete this task. Your work will be logged and can be resumed later."""
             if generator.generate_report(task_id):
                 print(f"📄 Report generated: logs/{task_id}/report.md")
             else:
-                print(f"⚠️  Report generation failed")
+                print("⚠️  Report generation failed")
 
     return task_id
 

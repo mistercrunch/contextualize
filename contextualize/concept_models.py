@@ -2,10 +2,10 @@
 Concept data models for Contextualize
 """
 
-import re
-from pathlib import Path
-from typing import List, Optional, Dict, Any
+import builtins
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Optional
 
 
 @dataclass
@@ -15,10 +15,10 @@ class Concept:
     # Core properties
     name: str
     content: str
-    references: List[str] = field(default_factory=list)
+    references: list[str] = field(default_factory=list)
 
     # File reference
-    file_path: Optional[Path] = None
+    file_path: Path | None = None
 
     @classmethod
     def from_file(cls, file_path: Path) -> Optional["Concept"]:
@@ -51,7 +51,7 @@ class Concept:
 
         return cls(name=name, content=content, references=references, file_path=file_path)
 
-    def save(self, file_path: Optional[Path] = None):
+    def save(self, file_path: Path | None = None):
         """Save concept to markdown file"""
         if file_path:
             self.file_path = file_path
@@ -75,7 +75,7 @@ references: {refs_str}
         """Get content size in characters"""
         return len(self.content)
 
-    def get_referenced_by(self, concepts: Dict[str, "Concept"]) -> List[str]:
+    def get_referenced_by(self, concepts: dict[str, "Concept"]) -> list[str]:
         """Get list of concepts that reference this one"""
         referenced_by = []
         for other_name, other_concept in concepts.items():
@@ -83,7 +83,7 @@ references: {refs_str}
                 referenced_by.append(other_name)
         return referenced_by
 
-    def validate_references(self, concepts: Dict[str, "Concept"]) -> List[str]:
+    def validate_references(self, concepts: dict[str, "Concept"]) -> list[str]:
         """Validate that all references exist, return missing ones"""
         missing = []
         for ref in self.references:
@@ -103,7 +103,7 @@ class ConceptCollection:
     def __init__(self, concepts_dir: Path = Path("context/concepts")):
         self.concepts_dir = concepts_dir
         self.concepts_dir.mkdir(parents=True, exist_ok=True)
-        self._concepts: Dict[str, Concept] = {}
+        self._concepts: dict[str, Concept] = {}
         self._loaded = False
 
     @classmethod
@@ -111,7 +111,7 @@ class ConceptCollection:
         """Create ConceptCollection from a specific path"""
         return cls(concepts_dir=path)
 
-    def load(self, force_reload: bool = False) -> Dict[str, Concept]:
+    def load(self, force_reload: bool = False) -> dict[str, Concept]:
         """Load all concepts from filesystem"""
         if self._loaded and not force_reload:
             return self._concepts
@@ -131,12 +131,12 @@ class ConceptCollection:
         self._loaded = True
         return self._concepts
 
-    def get(self, name: str) -> Optional[Concept]:
+    def get(self, name: str) -> Concept | None:
         """Get concept by name"""
         self.load()
         return self._concepts.get(name)
 
-    def list(self) -> List[Concept]:
+    def list(self) -> list[Concept]:
         """List all concepts"""
         self.load()
         return list(self._concepts.values())
@@ -167,7 +167,7 @@ class ConceptCollection:
 
         return True
 
-    def create(self, name: str, references: List[str] = None) -> Concept:
+    def create(self, name: str, references: builtins.list[str] = None) -> Concept:
         """Create a new concept with template"""
         references = references or []
 
@@ -187,7 +187,7 @@ class ConceptCollection:
 
         return self.add(concept)
 
-    def get_dependency_graph(self) -> Dict[str, List[str]]:
+    def get_dependency_graph(self) -> dict[str, builtins.list[str]]:
         """Get concept dependency graph"""
         self.load()
 
@@ -197,7 +197,7 @@ class ConceptCollection:
 
         return graph
 
-    def get_referenced_by(self, name: str) -> List[str]:
+    def get_referenced_by(self, name: str) -> builtins.list[str]:
         """Get concepts that reference a specific concept"""
         concept = self.get(name)
         if not concept:
@@ -205,7 +205,7 @@ class ConceptCollection:
 
         return concept.get_referenced_by(self._concepts)
 
-    def validate_all_references(self) -> Dict[str, List[str]]:
+    def validate_all_references(self) -> dict[str, builtins.list[str]]:
         """Validate all concept references, return missing ones"""
         self.load()
 
@@ -217,7 +217,7 @@ class ConceptCollection:
 
         return issues
 
-    def get_load_order(self) -> List[str]:
+    def get_load_order(self) -> builtins.list[str]:
         """Get concepts in dependency order (topological sort)"""
         self.load()
 
@@ -246,7 +246,7 @@ class ConceptCollection:
 
         return order
 
-    def load_with_dependencies(self, concept_names: List[str]) -> str:
+    def load_with_dependencies(self, concept_names: builtins.list[str]) -> str:
         """Load concepts with all their dependencies"""
         self.load()
 
@@ -278,7 +278,7 @@ class ConceptCollection:
 
         return content
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         """Get collection statistics"""
         self.load()
 

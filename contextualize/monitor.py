@@ -7,10 +7,10 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
 
-def check_task_status(task_id: str) -> Dict[str, Any]:
+def check_task_status(task_id: str) -> dict[str, Any]:
     """Check if a background task is still running"""
     task_dir = Path(f"logs/{task_id}")
 
@@ -52,7 +52,7 @@ def check_task_status(task_id: str) -> Dict[str, Any]:
     return metadata
 
 
-def wait_for_task(task_id: str, timeout: int = 300) -> Dict[str, Any]:
+def wait_for_task(task_id: str, timeout: int = 300) -> dict[str, Any]:
     """Wait for a background task to complete"""
     start_time = time.time()
 

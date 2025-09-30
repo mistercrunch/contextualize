@@ -2,15 +2,15 @@
 Data models for Contextualize
 """
 
+import builtins
 import json
 import shutil
-from datetime import datetime
-from pathlib import Path
-from typing import List, Optional, Dict, Any, TypeVar, Generic, Protocol
-from dataclasses import dataclass, field, asdict
-from enum import Enum
 from abc import ABC, abstractmethod
-
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any, Generic, Optional, TypeVar
 
 T = TypeVar("T")
 
@@ -21,7 +21,7 @@ class CollectionMixin(ABC, Generic[T]):
     def __init__(self, base_dir: Path):
         self.base_dir = base_dir
         self.base_dir.mkdir(parents=True, exist_ok=True)
-        self._items: Dict[str, T] = {}
+        self._items: dict[str, T] = {}
         self._loaded = False
 
     @classmethod
@@ -30,7 +30,7 @@ class CollectionMixin(ABC, Generic[T]):
         return cls(base_dir=path)
 
     @abstractmethod
-    def _load_item(self, path: Path) -> Optional[T]:
+    def _load_item(self, path: Path) -> T | None:
         """Load a single item from path"""
         pass
 
@@ -39,7 +39,7 @@ class CollectionMixin(ABC, Generic[T]):
         """Get ID from item"""
         pass
 
-    def load(self, force_reload: bool = False) -> Dict[str, T]:
+    def load(self, force_reload: bool = False) -> dict[str, T]:
         """Load all items from filesystem"""
         if self._loaded and not force_reload:
             return self._items
@@ -64,7 +64,7 @@ class CollectionMixin(ABC, Generic[T]):
         """Check if path should be loaded"""
         return not path.name.startswith(".")
 
-    def get(self, item_id: str, partial: bool = True) -> Optional[T]:
+    def get(self, item_id: str, partial: bool = True) -> T | None:
         """Get item by ID (supports partial matching)"""
         self.load()
 
@@ -80,7 +80,7 @@ class CollectionMixin(ABC, Generic[T]):
 
         return None
 
-    def list(self, limit: Optional[int] = None) -> List[T]:
+    def list(self, limit: int | None = None) -> list[T]:
         """List all items with optional limit"""
         self.load()
         items = list(self._items.values())
@@ -121,30 +121,30 @@ class Task:
     status: TaskStatus = TaskStatus.CREATED
 
     # Context
-    concepts: List[str] = field(default_factory=list)
+    concepts: list[str] = field(default_factory=list)
     context_from_main: str = ""
 
     # Relationships
-    parent_id: Optional[str] = None
+    parent_id: str | None = None
 
     # Session management
-    session_id: Optional[str] = None
+    session_id: str | None = None
 
     # Timestamps
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
     # Process info
-    pid: Optional[int] = None
+    pid: int | None = None
 
     # Directory reference
-    task_dir: Optional[Path] = None
+    task_dir: Path | None = None
 
     # Report configuration
-    report_template: Optional[str] = "context/reports/default.md"
-    report_status: Optional[str] = None  # pending, generating, completed, failed
-    report_generated_at: Optional[datetime] = None
-    report_session_id: Optional[str] = None
+    report_template: str | None = "context/reports/default.md"
+    report_status: str | None = None  # pending, generating, completed, failed
+    report_generated_at: datetime | None = None
+    report_session_id: str | None = None
 
     @classmethod
     def from_dir(cls, task_dir: Path) -> Optional["Task"]:
@@ -182,7 +182,7 @@ class Task:
             task_dir=task_dir,
         )
 
-    def save(self, task_dir: Optional[Path] = None):
+    def save(self, task_dir: Path | None = None):
         """Save task metadata to directory"""
         if task_dir:
             self.task_dir = task_dir
@@ -207,7 +207,7 @@ class Task:
         metadata_file = self.task_dir / "metadata.json"
         metadata_file.write_text(json.dumps(metadata, indent=2))
 
-    def get_output(self) -> Optional[str]:
+    def get_output(self) -> str | None:
         """Get task output if exists"""
         if not self.task_dir:
             return None
@@ -217,7 +217,7 @@ class Task:
             return output_file.read_text()
         return None
 
-    def get_error(self) -> Optional[str]:
+    def get_error(self) -> str | None:
         """Get task error if exists"""
         if not self.task_dir:
             return None
@@ -227,7 +227,7 @@ class Task:
             return error_file.read_text()
         return None
 
-    def get_input(self) -> Optional[Dict[str, Any]]:
+    def get_input(self) -> dict[str, Any] | None:
         """Get task input data"""
         if not self.task_dir:
             return None
@@ -274,7 +274,7 @@ class TaskCollection:
     def __init__(self, logs_dir: Path = Path("logs")):
         self.logs_dir = logs_dir
         self.dag_file = logs_dir / "dag.jsonl"
-        self._tasks: Dict[str, Task] = {}
+        self._tasks: dict[str, Task] = {}
         self._loaded = False
 
     @classmethod
@@ -282,7 +282,7 @@ class TaskCollection:
         """Create TaskCollection from a specific path"""
         return cls(logs_dir=path)
 
-    def load(self, force_reload: bool = False) -> Dict[str, Task]:
+    def load(self, force_reload: bool = False) -> dict[str, Task]:
         """Load all tasks from filesystem"""
         if self._loaded and not force_reload:
             return self._tasks
@@ -303,7 +303,7 @@ class TaskCollection:
         self._loaded = True
         return self._tasks
 
-    def get(self, task_id: str, partial: bool = True) -> Optional[Task]:
+    def get(self, task_id: str, partial: bool = True) -> Task | None:
         """Get task by ID (supports partial matching)"""
         self.load()
 
@@ -321,10 +321,10 @@ class TaskCollection:
 
     def list(
         self,
-        limit: Optional[int] = None,
-        status: Optional[TaskStatus] = None,
-        parent_id: Optional[str] = None,
-    ) -> List[Task]:
+        limit: int | None = None,
+        status: TaskStatus | None = None,
+        parent_id: str | None = None,
+    ) -> list[Task]:
         """List tasks with optional filters"""
         self.load()
 
@@ -397,11 +397,11 @@ class TaskCollection:
 
         return count
 
-    def get_children(self, parent_id: str) -> List[Task]:
+    def get_children(self, parent_id: str) -> builtins.list[Task]:
         """Get all tasks forked from a parent"""
         return self.list(parent_id=parent_id)
 
-    def get_tree(self, root_id: Optional[str] = None) -> Dict[str, Any]:
+    def get_tree(self, root_id: str | None = None) -> dict[str, Any]:
         """Build task tree structure"""
         self.load()
 
@@ -416,7 +416,7 @@ class TaskCollection:
             roots = [t for t in self._tasks.values() if not t.parent_id]
             return {"roots": [self._build_tree_node(r) for r in roots]}
 
-    def _build_tree_node(self, task: Task) -> Dict[str, Any]:
+    def _build_tree_node(self, task: Task) -> dict[str, Any]:
         """Build tree node for a task"""
         children = self.get_children(task.task_id)
 
@@ -438,7 +438,7 @@ class TaskCollection:
                         # Process finished
                         task.update_status(TaskStatus.COMPLETED)
 
-    def get_dag_entries(self) -> List[Dict[str, Any]]:
+    def get_dag_entries(self) -> builtins.list[dict[str, Any]]:
         """Get all DAG entries"""
         if not self.dag_file.exists():
             return []
@@ -463,7 +463,7 @@ class TaskCollection:
         with open(self.dag_file, "a") as f:
             f.write(json.dumps(entry) + "\n")
 
-    def stats(self) -> Dict[str, int]:
+    def stats(self) -> dict[str, int]:
         """Get collection statistics"""
         self.load()
 

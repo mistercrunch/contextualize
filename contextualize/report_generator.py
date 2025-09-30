@@ -6,7 +6,6 @@ Report generation for Contextualize tasks
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, Any
 
 try:
     from importlib import resources
@@ -14,8 +13,8 @@ except ImportError:
     # Python < 3.9
     import importlib_resources as resources
 
-from .models import Task, TaskCollection, TaskStatus
 from .claude_cli import ClaudeCLI
+from .models import Task, TaskCollection, TaskStatus
 
 
 class ReportGenerator:
@@ -25,7 +24,7 @@ class ReportGenerator:
         self.reports_dir = reports_dir
 
     def generate_report(
-        self, task_id: str, template_override: Optional[str] = None, regenerate: bool = False
+        self, task_id: str, template_override: str | None = None, regenerate: bool = False
     ) -> bool:
         """Generate a report for a completed task
 
@@ -132,7 +131,7 @@ class ReportGenerator:
                 .joinpath(template_name)
                 .read_text()
             )
-        except:
+        except (FileNotFoundError, AttributeError, ModuleNotFoundError):
             # Ultimate fallback to default template
             try:
                 return (
@@ -140,7 +139,7 @@ class ReportGenerator:
                     .joinpath("default.md")
                     .read_text()
                 )
-            except:
+            except (FileNotFoundError, AttributeError, ModuleNotFoundError):
                 # If even package resources fail, return minimal template
                 return """# Task Report: {{task_id}}
 ## Summary

@@ -4,13 +4,10 @@ Web-based DAG visualizer for task relationships
 """
 
 import json
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any
 
 import typer
 from rich.console import Console
-
 
 console = Console()
 
@@ -132,9 +129,15 @@ def generate_dag_html() -> str:
         <h1>🔀 Task DAG Visualization</h1>
         <div class="stats">
             <span class="stat">📊 Total Tasks: {len(tasks)}</span>
-            <span class="stat">✅ Completed: {len([t for t in tasks if t.get('status') == 'completed'])}</span>
-            <span class="stat">🔄 Running: {len([t for t in tasks if t.get('status') == 'running'])}</span>
-            <span class="stat">❌ Failed: {len([t for t in tasks if t.get('status') == 'failed'])}</span>
+            <span class="stat">✅ Completed: {
+                len([t for t in tasks if t.get('status') == 'completed'])
+            }</span>
+            <span class="stat">🔄 Running: {
+                len([t for t in tasks if t.get('status') == 'running'])
+            }</span>
+            <span class="stat">❌ Failed: {
+                len([t for t in tasks if t.get('status') == 'failed'])
+            }</span>
         </div>
     </div>
 
@@ -231,7 +234,6 @@ def serve_dag(port: int = 8080):
     import http.server
     import socketserver
     import webbrowser
-    from functools import partial
 
     class DAGHandler(http.server.SimpleHTTPRequestHandler):
         def do_GET(self):
