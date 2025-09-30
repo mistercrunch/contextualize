@@ -15,7 +15,9 @@ Contextualize extends Claude Code with three core capabilities:
 Claude Code is powerful, but operates with significant limitations:
 
 ### The Context Segmentation Dilemma
+
 Power users have discovered that **context segmentation is key** to getting great results from Claude. Using the `Task` tool or subagents to manage context more actively can be powerful—giving focused context to specific problems. But this approach comes with significant drawbacks:
+
 - **No persistence** - subtasks vanish when complete
 - **No observability** - can't inspect what happened
 - **No resumability** - can't pick up where you left off
@@ -24,19 +26,25 @@ Power users have discovered that **context segmentation is key** to getting grea
 You're forced to choose: either dump everything into context (and get confused responses), or use ephemeral subtasks (and lose all your work history).
 
 ### One-Size-Fits-All Context
+
 Without proper segmentation tools, projects rely on monolithic `CLAUDE.md` files that dump everything into context. Every task—whether fixing a typo or refactoring architecture—gets the same overwhelming context. This leads to:
+
 - Token waste on irrelevant information
 - Confused responses mixing unrelated concerns
 - Hallucinated imports from parts of the codebase not actually needed
 
 ### Limited Context Management
+
 While Claude Code's `.claude/commands/` and `.claude/agents/` directories offer some ways to manage certain types of context, they're:
+
 - Limited to specific use cases (commands and agent personalities)
 - Not composable or reusable across tasks
 - Still require dumping everything into the main session
 
 ### Context Fragmentation
+
 Every AI tool wants its own format:
+
 - `CLAUDE.md` for Claude
 - `CURSOR.md` for Cursor
 - `.aider.conf.yml` for Aider
@@ -81,6 +89,7 @@ Traditional Claude:                    With Contextualize:
 ### What Contextualize Provides
 
 Instead of ephemeral subtasks with full context, Contextualize creates:
+
 - **Isolated sessions** with targeted context via `claude --session-id`
 - **Persistent task records** with full I/O logging in `logs/`
 - **Concept loading** from your `context/concepts/` knowledge base
@@ -89,26 +98,31 @@ Instead of ephemeral subtasks with full context, Contextualize creates:
 ## Key Features
 
 ### 🎯 **Surgical Context Loading**
+
 - Load only relevant "concepts" per task
 - Self-referencing knowledge network
 - Reusable, composable context modules
 
 ### 🔀 **Multi-Session Orchestration**
+
 - Each task runs in its own Claude session
 - Parallel task execution without context pollution
 - Session IDs enable persistence and resumability
 
 ### 🔍 **Full Observability**
+
 - Track all tasks in a visual DAG
 - Complete input/output logging
 - Inspect any task's context and results
 
 ### ⏮️ **Time Travel & Forking**
+
 - Resume any session exactly where it left off
 - Fork from any task when issues arise
 - Build on previous work without starting over
 
 ### 🦘 **Session Hopping**
+
 - Jump between related tasks
 - Carry forward learned context
 - Build a living knowledge graph as you work
@@ -173,6 +187,7 @@ ctx task status                     # All task statuses
 ## Core Concepts
 
 ### Concepts
+
 Reusable knowledge modules in `context/concepts/`. Each concept is a markdown file with frontmatter:
 
 ```markdown
@@ -190,14 +205,18 @@ references: [core, oauth]
 ```
 
 ### Tasks
+
 Every substantial piece of work becomes a tracked task with:
+
 - Unique ID and session
 - Isolated context (only needed concepts)
 - Full input/output logging
 - Parent relationships (for forks)
 
 ### DAG (Directed Acyclic Graph)
+
 Visual representation of task relationships showing:
+
 - Task dependencies
 - Fork points
 - Success/failure status
@@ -240,19 +259,24 @@ ctx task resume 8f3d
 ## Advanced Features
 
 ### Async Task Execution
+
 Run tasks in background while continuing work:
+
 ```bash
 ctx launch-async --desc "Generate test suite" --concepts "testing"
 ```
 
 ### Web-based DAG Visualization
+
 ```bash
 python -m contextualize.dag_visualizer serve
 # Opens browser with interactive DAG viewer
 ```
 
 ### Dogfooding Mode
+
 Let Contextualize build itself:
+
 ```bash
 ctx dogfood
 # Launches Claude with context about the framework
@@ -265,6 +289,7 @@ ctx dogfood
 This is an early POC demonstrating active context engineering. Expect rough edges and breaking changes.
 
 ### Working Features ✅
+
 - Basic task launching and tracking
 - Concept organization and loading
 - DAG visualization
@@ -272,6 +297,7 @@ This is an early POC demonstrating active context engineering. Expect rough edge
 - CLI interface
 
 ### In Development 🚧
+
 - Full MCP server integration
 - Better async execution
 - Concept auto-discovery
@@ -281,14 +307,18 @@ This is an early POC demonstrating active context engineering. Expect rough edge
 ## Project Goals
 
 ### Immediate: Empower Claude Code Users
+
 Enable Claude Code power users to take context engineering to the next level through:
+
 - **Better context management** - Move beyond monolithic CLAUDE.md files
 - **Active session orchestration** - Control multiple focused sessions instead of one bloated context
 - **Full observability** - See what your AI agents are actually doing
 - **Knowledge persistence** - Build on previous work instead of starting fresh
 
 ### Long-term: Inspire Native Implementation
+
 This project serves as a **proof of concept** for enhanced workflows that could inspire the Claude Code team to implement these concepts natively:
+
 - Demonstrate the value of context segmentation
 - Prove that session persistence improves productivity
 - Show how task relationships enable better debugging
@@ -299,6 +329,7 @@ If these patterns gain traction and prove valuable to the community, they could 
 ## Contributing
 
 We're exploring the future of AI-assisted development. If you're a Claude Code power user who's felt the pain of context management, we'd love your input:
+
 - Share your workflows and pain points
 - Contribute concepts and patterns
 - Help test and refine the framework

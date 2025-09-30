@@ -13,23 +13,29 @@ Meanwhile, each tool invents its own context format - `CLAUDE.md`, `CURSOR.md`, 
 **Contextualize** is an active context engineering framework that treats context not as a massive dump of information, but as a carefully orchestrated network of focused, reusable concepts. Built on top of Claude Code, it enables:
 
 ### 🎯 **Targeted Context Injection**
+
 Launch tasks with *only* the concepts they need. No more flooding the context window with irrelevant code.
 
 ### 🔀 **Multi-Session Orchestration**
+
 Every substantial task gets its own Claude session with its own focused context. Work on multiple features in parallel without context pollution.
 
 ### 🔍 **Full Observability**
+
 Track every task, its inputs, outputs, and relationships in a visual DAG. Know exactly what your AI agents are doing and why.
 
 ### ⏮️ **Session Time Travel**
+
 Resume any session exactly where it left off. Fork from failure points. Your AI's work becomes truly persistent and debuggable.
 
 ### 🦘 **Session Hopping**
+
 Jump between related tasks, carrying forward learned context. Build a living knowledge graph as you work.
 
 ## How It Works
 
 Instead of this:
+
 ```bash
 # Traditional approach - dump everything
 claude "Help me fix the auth bug" --context ./src/**/*.ts
@@ -37,6 +43,7 @@ claude "Help me fix the auth bug" --context ./src/**/*.ts
 ```
 
 Contextualize enables this:
+
 ```bash
 # Targeted, focused context
 ctx launch-async \
@@ -46,6 +53,7 @@ ctx launch-async \
 ```
 
 Each task runs in isolation with:
+
 - **Minimal context** from curated concept files
 - **Full logging** of inputs and outputs
 - **Session persistence** via unique IDs
@@ -75,6 +83,7 @@ The word itself comes from Latin *contexere*—"to weave together." Just as thre
 In any complex system, context is the invisible substrate that makes understanding possible. It's not just information—it's the relationships between information, the history that shaped it, the constraints that bound it, and the intentions that drive it.
 
 Context is:
+
 - **Applicable knowledge**: Information becomes context when it can be applied to understand or change something
 - **Multi-dimensional**: The same information serves different purposes from different perspectives
 - **Self-referential**: Context contains meta-context—information about how to interpret information
@@ -85,6 +94,7 @@ Context is:
 Code is context crystallized.
 
 It's the most extreme form of context—so practical, so specific, so materialized that it can be executed. Code is:
+
 - **Context at its densest**: Every line embodies decisions, constraints, and intentions
 - **Point-in-time truth**: A snapshot of understanding made runnable
 - **Self-verifying context**: It either works or it doesn't
@@ -102,6 +112,7 @@ Abstract, general, stable                    Concrete, specific, volatile
 ```
 
 **Comments** are micro-context—the most localized form of human-readable context. They live at the boundary between human and machine understanding:
+
 - **Inline comments**: Context at its most granular, explaining the non-obvious
 - **Block comments**: Regional context, explaining local complexity
 - **Doc comments**: Interface context, explaining contracts and usage
@@ -111,6 +122,7 @@ Comments are context that couldn't be expressed in code. They're admissions that
 ### The Paradox of Context
 
 Context is simultaneously:
+
 - Universal (everyone needs it) yet particular (everyone needs different parts)
 - Implicit (assumed knowledge) yet explicit (must be communicated)
 - Stable (conventions persist) yet dynamic (understanding evolves)
@@ -121,6 +133,7 @@ Context is simultaneously:
 ### The Cost of Chaos
 
 Without organization, context:
+
 - **Decays**: Knowledge erodes with time and team changes
 - **Fragments**: Understanding splits across minds, documents, and tools
 - **Repeats**: The same questions get answered again and again
@@ -129,6 +142,7 @@ Without organization, context:
 ### The Power of Structure
 
 Organized context:
+
 - **Accumulates**: Knowledge builds rather than resets
 - **Transfers**: Understanding moves between people and tools
 - **Scales**: Complexity becomes navigable
@@ -143,9 +157,11 @@ Context organizes along multiple axes—some fundamental to human cognition, oth
 These three dimensions reflect how humans naturally organize knowledge:
 
 #### 1. Subject Dimension (Perspectives)
+
 Context through the lens of different disciplines and roles.
 
 Each perspective asks different questions about the same system:
+
 - **Architecture**: How is it structured? What are the boundaries?
 - **Engineering**: How does it work? What are the patterns?
 - **Product**: What problems does it solve? For whom?
@@ -155,9 +171,11 @@ Each perspective asks different questions about the same system:
 This is context organized by *who needs to know*.
 
 #### 2. Task Dimension (Capabilities)
+
 Context organized by what needs to be accomplished.
 
 Knowledge clustered around action:
+
 - **Setup**: What's needed to begin?
 - **Development**: How to build and test?
 - **Debugging**: How to diagnose and fix?
@@ -167,9 +185,11 @@ Knowledge clustered around action:
 This is context organized by *what needs to be done*.
 
 #### 3. Outcome Dimension (Artifacts)
+
 Context organized around deliverables and their histories.
 
 The specifications, decisions, and learnings that produced results:
+
 - **Features**: What was built and why?
 - **Decisions**: What trade-offs were made?
 - **Experiments**: What was tried and learned?
@@ -182,6 +202,7 @@ This is context organized by *what was achieved*.
 These dimensions arise from the mechanics of software development and collaboration:
 
 #### 4. Temporal Dimension (When)
+
 Context across time and change.
 
 - **Versioning**: How did we get here?
@@ -192,6 +213,7 @@ Context across time and change.
 This is context organized by *when it matters*.
 
 #### 5. Scope Dimension (Where)
+
 Context boundaries and hierarchies.
 
 - **Local vs Global**: Project-specific or universal?
@@ -202,6 +224,7 @@ Context boundaries and hierarchies.
 This is context organized by *where it applies*.
 
 #### 6. Authority Dimension (Trust)
+
 Context about permissions and ownership.
 
 - **Access control**: Who can see or change this?
@@ -212,6 +235,7 @@ Context about permissions and ownership.
 This is context organized by *who decides*.
 
 #### 7. Interaction Dimension (Protocol)
+
 Context about how systems and tools engage.
 
 - **Tool protocols**: How does each tool consume this?
@@ -226,6 +250,7 @@ This is context organized by *how to engage*.
 In a seven-dimensional space, the same piece of information naturally appears in multiple locations. This isn't inefficiency—it's perspective.
 
 Consider a simple test command `npm test`:
+
 - Appears in `operations/commands.yaml` (task dimension)
 - Documented in `development/testing.md` (subject dimension)
 - Referenced in `projects/feature-x/spec.md` (outcome dimension)
@@ -237,6 +262,7 @@ Each appearance serves a different cognitive need. The duplication is the point�
 ## The Interplay
 
 The magic happens at the intersections:
+
 - A **task** viewed through different **perspectives** reveals complexity
 - An **outcome** changes across **time** showing evolution
 - A **scope** defines **authority** establishing boundaries
@@ -251,11 +277,13 @@ The seven dimensions create a rich context space where knowledge lives in multip
 ### Structure vs. Emergence
 
 Too much structure and context becomes:
+
 - Rigid, unable to adapt
 - Burdensome to maintain
 - Disconnected from reality
 
 Too little structure and context becomes:
+
 - Chaotic, impossible to navigate
 - Inconsistent across sources
 - Lost in noise
@@ -351,25 +379,33 @@ CONTEXT/
 ### Must-Have Files by Project Lifecycle
 
 #### Early Stage (Exploration)
+
 Start minimal:
+
 - `OVERVIEW.md` - What are we building?
 - `setup.md` - How to get started
 - `architecture.md` - Initial design decisions
 
 #### Active Development
+
 Add task-oriented context:
+
 - `tasks/testing.md` - Test strategy and commands
 - `tasks/debugging.md` - Common issues and solutions
 - `perspectives/engineering.md` - Coding conventions
 
 #### Production
+
 Add operational context:
+
 - `operations/deployment.md` - Ship process
 - `environments/*.md` - Environment-specific configs
 - `operations/monitoring.md` - What to watch
 
 #### Maintenance
+
 Preserve history:
+
 - `history/ARCHIVE/` - Completed project specs
 - `outcomes/decisions/` - ADRs and trade-offs
 - `outcomes/migrations/` - How we evolved
@@ -379,11 +415,13 @@ Preserve history:
 Use these standard names when the concept applies:
 
 **Universal files** (always relevant):
+
 - `README.md` - Navigation and overview
 - `setup.md` - Getting started
 - `commands.yaml` - Executable operations
 
 **Common patterns** (use when applicable):
+
 - `testing.md` not "test-guide.md"
 - `deployment.md` not "deploy-process.md"
 - `architecture.md` not "system-design.md"
@@ -394,6 +432,7 @@ The goal: A developer moving between projects finds familiar structure.
 ### Progressive Enhancement
 
 Start with flat files:
+
 ```
 CONTEXT/
 ├── README.md
@@ -402,6 +441,7 @@ CONTEXT/
 ```
 
 Evolve to folders as complexity grows:
+
 ```
 CONTEXT/
 ├── README.md
@@ -413,6 +453,7 @@ CONTEXT/
 ```
 
 Eventually reach full dimensionality:
+
 ```
 CONTEXT/
 ├── [7 dimension folders]
@@ -430,6 +471,7 @@ Context engineering is the discipline of making implicit knowledge explicit, sca
 It's not about creating more documentation. It's about creating the right knowledge, in the right place, at the right time, for the right audience—human or machine.
 
 When context is engineered well:
+
 - Questions have homes
 - Knowledge has structure
 - Understanding has paths

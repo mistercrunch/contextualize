@@ -25,6 +25,7 @@ Each Task:
 ### 1. MCP Server (`task-launcher-sdk.py`)
 
 Provides deterministic Python tools via `@tool` decorator:
+
 - `launch_task`: Creates new task with isolated context
 - `fork_task`: Branches from existing task
 - `complete_task`: Saves structured reports
@@ -61,6 +62,7 @@ logs/
 ### Session ID Powers
 
 Each task gets its own session ID which enables:
+
 - **Resume**: `claude --resume {session_id}` to re-enter any task
 - **Inspection**: `/status` within a session shows its ID
 - **Fork**: `claude --resume {session_id} --fork-session` creates a branch
@@ -182,21 +184,25 @@ $ cw resume abc123
 ## Weekend Implementation Plan
 
 ### Saturday Morning: Core Infrastructure
+
 - [ ] Set up context/concepts/ folder with 5-10 concepts
 - [ ] Create task-launcher-sdk.py with MCP tools
 - [ ] Test basic task launch and logging
 
 ### Saturday Afternoon: Task Management
+
 - [ ] Implement fork_task for branching
 - [ ] Add complete_task for reports
 - [ ] Build DAG tracking
 
 ### Sunday Morning: CLI & Visualization
+
 - [ ] Create `cw` CLI tool
 - [ ] Build DAG HTML visualizer
 - [ ] Add task inspection commands
 
 ### Sunday Afternoon: Demo & Documentation
+
 - [ ] Record demo video showing task forking
 - [ ] Show context isolation benefits
 - [ ] Document setup instructions

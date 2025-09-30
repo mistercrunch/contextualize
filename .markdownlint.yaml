@@ -1,0 +1,44 @@
+# Markdownlint configuration for Contextualize
+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Default state for all rules
+default: true
+
+# Line length - disabled for now due to many existing docs
+MD013: false
+
+# Allow emphasis used as heading - common in our docs
+MD036: false
+
+# Allow code blocks without language specification
+MD040: false
+
+# Allow inline HTML
+MD033: false
+
+# Allow duplicate headings
+MD024:
+  siblings_only: true
+
+# Allow trailing punctuation in headings
+MD026: false
+
+# Allow multiple spaces after blockquote marker
+MD027: false
+
+# First line in file should be a top-level heading
+MD041: false
+
+# Allow bare URLs
+MD034: false
+
+# Heading style
+MD003:
+  style: "atx"
+
+# Unordered list style
+MD004:
+  style: "dash"
+
+# Allow multiple top-level headings
+MD025: false

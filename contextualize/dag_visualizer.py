@@ -236,7 +236,7 @@ def serve_dag(port: int = 8080):
     import webbrowser
 
     class DAGHandler(http.server.SimpleHTTPRequestHandler):
-        def do_GET(self):
+        def do_GET(self):  # noqa: N802
             if self.path == "/" or self.path == "/dag":
                 html = generate_dag_html()
                 self.send_response(200)
@@ -246,8 +246,8 @@ def serve_dag(port: int = 8080):
             else:
                 super().do_GET()
 
-    Handler = DAGHandler
-    with socketserver.TCPServer(("", port), Handler) as httpd:
+    handler = DAGHandler
+    with socketserver.TCPServer(("", port), handler) as httpd:
         console.print(f"[green]DAG visualization server running at http://localhost:{port}[/green]")
         console.print("[yellow]Press Ctrl+C to stop[/yellow]")
 

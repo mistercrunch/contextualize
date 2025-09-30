@@ -1,25 +1,87 @@
+# Pre-commit hooks for Contextualize
+# See https://pre-commit.com for more information
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.0
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
     hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+        args: ['--allow-multiple-documents']
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: trailing-whitespace
+
+  # Python-specific checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-docstring-first
+      - id: debug-statements
+      - id: fix-encoding-pragma
+        args: ['--remove']
+
+  # JSON/YAML/TOML checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-json
+      - id: check-toml
+      - id: pretty-format-json
+        args: ['--autofix', '--indent=2']
+        exclude: '\.ipynb$'
+
+  # Security checks - only warn, don't fail
+  # Uncomment to enable secret detection
+  # - repo: https://github.com/Yelp/detect-secrets
+  #   rev: v1.5.0
+  #   hooks:
+  #     - id: detect-secrets
+  #       exclude: '\.lock$|\.ipynb$'
+
+  # Python formatting with Ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      # Run the linter
       - id: ruff
-        args: [--fix]
+        args: ['--fix', '--show-fixes']
+      # Run the formatter
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-added-large-files
-      - id: check-json
-      - id: check-merge-conflict
-      - id: check-toml
+  # Type checking with mypy (optional, can be slow)
+  # Uncomment if you want strict type checking
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.14.1
+  #   hooks:
+  #     - id: mypy
+  #       additional_dependencies: [types-all]
+  #       args: ['--ignore-missing-imports']
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.0
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.43.0
     hooks:
-      - id: mypy
-        additional_dependencies: [types-all]
-        args: [--ignore-missing-imports]
+      - id: markdownlint
+        args: ['--fix']
+        exclude: 'CHANGELOG.md'
+
+# Global configuration
+default_language_version:
+  python: python3.10
+
+# Most exclusions handled by .gitignore
+# Only need to exclude a few additional patterns
+exclude: |
+  (?x)^(
+    \.git/|
+    \.pre-commit-config\.yaml\.bak
+  )

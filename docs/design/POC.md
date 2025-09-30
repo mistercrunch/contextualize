@@ -7,6 +7,7 @@ We've identified a clean approach using Claude Code's MCP (Model Context Protoco
 ## Core Innovation
 
 Instead of trying to capture Claude's ephemeral subtasks, we make EVERY operation a managed task that:
+
 1. Runs as its own Claude session with a controlled session ID
 2. Loads only the context it needs
 3. Logs everything to a persistent filesystem structure
@@ -272,6 +273,7 @@ For the POC, synchronous execution is fine - it keeps things simple and observab
 ---
 
 ## Project Structure
+
 ```yaml
 # .claude/commands/task-run.md
 ---
@@ -290,6 +292,7 @@ Usage: /task-run --task=debug-test --concepts=testing,debugging
 ```
 
 ### 3. MCP Server Approach
+
 Create an MCP server for context management:
 
 ```javascript
@@ -329,6 +332,7 @@ Launch with: `claude --mcp-config ./mcp-context-manager.json`
 ### Session State Capture
 
 **Option A: File Watching**
+
 ```python
 # Watch Claude Code's working directory
 import watchdog
@@ -337,6 +341,7 @@ watcher.schedule(SessionHandler(), path='.', recursive=True)
 ```
 
 **Option B: Process Monitoring**
+
 ```python
 # Monitor Claude Code process tree
 import psutil
@@ -346,6 +351,7 @@ for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
 ```
 
 **Option C: Hook via Settings**
+
 ```json
 // .claude/settings.json
 {
@@ -371,6 +377,7 @@ $ claude 2>&1 | tee >(context-manager capture)
 ## Minimal Weekend POC
 
 ### Saturday: Foundation
+
 1. **Morning:** Context mesh with references
    - Create concepts/ structure
    - Build reference resolver
@@ -382,6 +389,7 @@ $ claude 2>&1 | tee >(context-manager capture)
    - Write metadata and logs
 
 ### Sunday: Magic Features
+
 1. **Morning:** Session operations
    - List sessions command
    - View session history
@@ -544,12 +552,14 @@ $ cw visualize
 ## Tools & Libraries
 
 ### Required
+
 - Python/Node for orchestration
 - File watcher (watchdog/chokidar)
 - Simple web server for UI
 - YAML parser
 
 ### Nice to Have
+
 - Mermaid for DAG rendering
 - SQLite for session index
 - WebSocket for live updates
@@ -570,16 +580,19 @@ A POC is successful if it demonstrates:
 ## Impact & Distribution Strategy
 
 ### The Goal
+
 Become part of the conversation shaping AI-assisted development. Get the ideas adopted, not necessarily build everything ourselves.
 
 ### Distribution Plan
 
 **Week 1: Build POC**
+
 - Weekend: Core implementation
 - Monday-Tuesday: Polish and document
 - Wednesday: Record demo video
 
 **Week 2: Launch**
+
 1. **Blog Post:** "How Coding Agents Should Actually Work"
    - Link to manifesto (README)
    - Link to framework (FRAMEWORK.md)
@@ -600,6 +613,7 @@ Become part of the conversation shaping AI-assisted development. Get the ideas a
 ### The Multiplier Effect
 
 Even a simple POC that shows:
+
 - A task forking after failure
 - The same task succeeding with different context
 - A DAG visualization of the exploration
@@ -609,6 +623,7 @@ Even a simple POC that shows:
 ### Long-term Vision
 
 **Success looks like:**
+
 - Other tools adopt context segmentation
 - Session persistence becomes standard
 - Someone builds the full framework
@@ -622,6 +637,7 @@ Even a simple POC that shows:
 ## Claude Code Session Investigation
 
 ### Where Sessions Are Stored
+
 Based on investigation, Claude Code stores data in:
 
 1. **~/.claude.json** - Main configuration and project history
@@ -641,12 +657,14 @@ Based on investigation, Claude Code stores data in:
 ### Critical Findings
 
 **No accessible subtask data!**
+
 - Subtasks execute in memory only
 - No logs or output files created
 - No way to "enter" a completed subtask
 - Output vanishes after completion
 
 **Session resumption is limited:**
+
 - `--resume [sessionId]` works but requires the session to exist in memory
 - `--fork-session` creates a new branch but doesn't preserve task state
 - No access to subtask internals
@@ -656,6 +674,7 @@ Based on investigation, Claude Code stores data in:
 **Can't directly access Claude Code subtask data.**
 
 This means we need to:
+
 1. **Intercept at runtime** - Capture streaming output as tasks execute
 2. **Build our own persistence layer** - Save what Claude Code doesn't
 3. **Use Gemini CLI fork** for true implementation
@@ -783,6 +802,7 @@ subprocess.run(["python3", "task-launcher.py", "$ARGUMENTS"])
 ```
 
 Remember to end with a structured report as instructed.
+
 ```
 
 ### Bonus: Custom Agents on the Fly!
@@ -815,6 +835,7 @@ def launch_specialized_task(prompt, agent_type="debugger"):
 ### This Enables Everything!
 
 Now we can:
+
 1. **Launch tasks deterministically**: Each task gets its own Claude session with controlled ID
 2. **Control context precisely**: Load only needed concepts in the prompt
 3. **Capture all output**: Everything saved to `logs/{task_id}/`
@@ -843,6 +864,7 @@ $ python3 visualize-dag.py
 ## Next Steps
 
 ### Immediate (This Weekend)
+
 1. [ ] Fork Gemini CLI repo
 2. [ ] Create basic context mesh
 3. [ ] Add session persistence layer
@@ -850,6 +872,7 @@ $ python3 visualize-dag.py
 5. [ ] Record compelling demo
 
 ### Follow-up (Next Week)
+
 1. [ ] Write blog post
 2. [ ] Create video walkthrough
 3. [ ] Submit to aggregators

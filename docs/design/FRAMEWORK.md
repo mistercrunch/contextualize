@@ -1,5 +1,7 @@
 # How Coding Agents Should Actually Work
+
 ## A Proposal for Context-First Development
+
 ### Draft v0.1
 
 ---
@@ -9,12 +11,14 @@
 Today's AI coding assistants—Claude Code, Cursor, Aider—have revolutionized development speed. Yet they share fundamental limitations in how they manage context and execution.
 
 **The fragmentation problem:**
+
 - Every tool demands its own context format: `CLAUDE.md`, `CURSOR.md`, `.aider.conf`
 - The same knowledge gets duplicated across multiple files
 - No universal standard for structuring project context
 - Teams maintain parallel documentation for humans and each AI tool
 
 **The context window crisis:**
+
 - Context windows are precious and expensive computational resources
 - Most tasks perform better with focused, relevant context
 - Yet current tools force an all-or-nothing approach
@@ -22,6 +26,7 @@ Today's AI coding assistants—Claude Code, Cursor, Aider—have revolutionized 
 - The optimal solution—precise context per task—remains manual and error-prone
 
 **The operational pain points:**
+
 - Main sessions accumulate context from dozens of unrelated tasks
 - Subtasks execute in black boxes—no logs, no debugging, no learning
 - Developers hesitate to spawn subtasks they cannot observe
@@ -35,28 +40,36 @@ Today's AI coding assistants—Claude Code, Cursor, Aider—have revolutionized 
 The current generation of coding agents treats context as monolithic and sessions as ephemeral. A context-first approach inverts these assumptions:
 
 ### Core Principle: Universal Context Standards
+
 Context becomes tool-agnostic and modular:
+
 - One source of truth for all agents and humans
 - Structured knowledge that any tool can consume
 - No more `CLAUDE.md` vs `CURSOR.md` duplication
 - Context modules that compose based on task needs
 
 ### Core Principle: Precise Context Loading
+
 Every subtask receives exactly the context required for its specific purpose:
+
 - Test debugging loads testing patterns and error handling concepts
 - API refactoring loads backend architecture and API conventions
 - Database migrations load schemas and data models
 - **Result:** Faster execution, lower costs, better outcomes
 
 ### Core Principle: Full Observability
+
 All agent activity becomes inspectable and persistent:
+
 - Any session can be entered, even after completion
 - Streaming logs capture agent reasoning in real-time
 - Structured reports document outcomes
 - Failed tasks preserve full diagnostic information
 
 ### Core Principle: Non-Linear Workflows
+
 Context segmentation enables exploration and recovery:
+
 - Failed tasks can be forked to explore alternatives
 - Dead sessions can be resumed with different models
 - Previous contexts can be recycled into new sessions
@@ -65,6 +78,7 @@ Context segmentation enables exploration and recovery:
 ## The Framework: Structure and Execution
 
 ### Persistent Session Architecture
+
 ```
 logs/session_123/task_456/
 ├── metadata.yml    # Task configuration and context loaded
@@ -75,6 +89,7 @@ logs/session_123/task_456/
 Every task becomes a permanent artifact—inspectable, resumable, learnable.
 
 ### Hierarchical Context Organization
+
 ```
 context/
 ├── concepts/       # Atomic knowledge units
@@ -91,6 +106,7 @@ context/
 Knowledge becomes modular, reusable, and precisely loadable.
 
 ### Recovery and Exploration Patterns
+
 ```bash
 # When a task fails
 > Task 456 failed: Cannot resolve module
@@ -127,6 +143,7 @@ Failure becomes a starting point, not an ending.
 ## Implications
 
 ### For Development Practice
+
 - Subtasks become the default, not the exception
 - Context pollution becomes manageable through segmentation
 - Failed tasks become recoverable assets
@@ -134,12 +151,14 @@ Failure becomes a starting point, not an ending.
 - Past work becomes reusable knowledge
 
 ### For Team Collaboration
+
 - Context libraries become shared resources
 - AI workflows become observable and reviewable
 - Problem-solving patterns become reproducible
 - Collective learning emerges from individual sessions
 
 ### For Tool Evolution
+
 - DAG visualization of AI work becomes possible
 - Context modules become shareable packages
 - Different approaches become benchmarkable
@@ -343,6 +362,7 @@ Deterministic loading through structured references:
 ```
 
 **Context Loading Rules:**
+
 1. Load referenced concept recursively
 2. Stop at already-loaded concepts (no cycles)
 3. Union all concepts for task execution
@@ -485,6 +505,7 @@ context/
 Use these canonical names when applicable:
 
 **Universal Concepts:**
+
 - `structure.md` - Codebase organization
 - `architecture.md` - System design
 - `testing.md` - Test strategy
@@ -492,6 +513,7 @@ Use these canonical names when applicable:
 - `environment.md` - Dev/prod setup
 
 **Not:**
+
 - ~~`folder-map.md`~~
 - ~~`test-guide.md`~~
 - ~~`code-style.md`~~
@@ -499,6 +521,7 @@ Use these canonical names when applicable:
 ### Progressive Adoption
 
 #### Stage 1: Basic Context (Manual)
+
 ```
 context/
 ├── README.md
@@ -507,6 +530,7 @@ context/
 ```
 
 #### Stage 2: Structured Context (Semi-automated)
+
 ```
 context/
 ├── concepts/
@@ -518,6 +542,7 @@ context/
 ```
 
 #### Stage 3: Full Framework (Automated)
+
 ```
 context/
 ├── [full structure]
@@ -555,6 +580,7 @@ models:
 ## Appendix A: Schemas
 
 ### Concept Schema
+
 ```yaml
 name: string (required)
 type: concept
@@ -563,6 +589,7 @@ deprecated: boolean
 ```
 
 ### Agent Schema
+
 ```yaml
 name: string (required)
 type: agent
@@ -573,6 +600,7 @@ tools: [string]
 ```
 
 ### Command Schema
+
 ```yaml
 name: string (required)
 type: command
@@ -584,6 +612,7 @@ timeout: duration
 ```
 
 ### Task Metadata Schema
+
 ```yaml
 task_id: string
 parent_ids: [string]

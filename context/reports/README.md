@@ -29,6 +29,7 @@ You can add your own templates to this directory:
 ## Template Variables
 
 Common variables available in all templates:
+
 - `{{task_id}}` - Unique task identifier
 - `{{description}}` - Task description
 - `{{started_at}}` - Start timestamp

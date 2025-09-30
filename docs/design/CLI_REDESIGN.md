@@ -3,6 +3,7 @@
 ## Commands to Keep (Working)
 
 ### Core Workflow
+
 - `ctx init` - Initialize project structure
 - `ctx launch <description>` - Launch task with focused context
   - `--concepts/-c` - Comma-separated concepts to load
@@ -16,18 +17,22 @@
 - `ctx fork <task-id> <description>` - Fork from existing task
 
 ### Concept Management
+
 - `ctx concepts` - List all concepts
 - `ctx concepts <name>` - Display specific concept
 
 ### Monitoring
+
 - `ctx status` - Check running/completed tasks
 
 ### Utility
+
 - `ctx version` - Version info
 
 ## Commands to Remove/Defer
 
 ### Removed (Not Working/Needed)
+
 - `start` - MCP config doesn't work as intended
 - `install` - Needs rethinking for Claude integration
 - `launch-async` - Just use `launch --bg` instead
@@ -37,20 +42,24 @@
 ### To Add Later
 
 #### Session Management
+
 - `ctx sessions` - List all sessions with status
 - `ctx kill <task-id>` - Stop a running background task
 - `ctx clean` - Clean up old logs/sessions
 
 #### Concept Tools
+
 - `ctx concept new <name>` - Create concept from template
 - `ctx concept graph` - Show concept dependency graph
 - `ctx concept validate` - Check references are valid
 
 #### Export/Import
+
 - `ctx export <task-id>` - Export task for sharing
 - `ctx import <file>` - Import task/concept bundle
 
 #### Analytics
+
 - `ctx stats` - Usage statistics
 - `ctx dag --web` - Web-based DAG viewer
 
