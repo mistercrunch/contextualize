@@ -133,7 +133,7 @@ Instead of ephemeral subtasks with full context, Contextualize creates:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/contextualize.git
+git clone https://github.com/mistercrunch/contextualize.git
 cd contextualize
 
 # Install with uv (recommended)
@@ -145,43 +145,101 @@ pip install -e .
 
 ### Setup
 
-The `ctx` CLI works alongside `claude` as a companion tool:
-
 ```bash
-# Step 1: Install Claude Code integration (optional but recommended)
-ctx install
-# Choose 'project' for local .claude/ or 'global' for ~/.claude/
-
-# Step 2: Initialize Contextualize in your project
+# Step 1: Initialize Contextualize in your project
 ctx init
 
+# You'll be prompted to:
+# - Create project structure (context/, logs/)
+# - Install ContextualizeAgent for Claude Code (recommended)
+# - Choose installation: 'project' (.claude/) or 'global' (~/.claude/)
+
 # This creates:
-# - context/concepts/ - Your reusable knowledge modules
-# - logs/ - Task history and outputs
-# - .claude/commands/ - Custom Claude commands (if project install)
+# - context/concepts/    - Your reusable knowledge modules
+# - context/reports/     - Report templates
+# - logs/               - Task history and outputs
+# - .claude/agents/     - ContextualizeAgent (if installed)
+# - .claude/commands/   - Slash commands (if installed)
 ```
 
 ### Basic Usage
 
-```bash
-# Initialize project
-ctx init
+#### With Claude Code Integration (Recommended)
 
+```bash
+# In Claude Code, use the ContextualizeAgent:
+/contextualize implement user authentication system
+
+# Or tell Claude directly:
+"Use ContextualizeAgent to refactor the database layer"
+
+# The agent automatically:
+# - Detects needed concepts (auth, database, etc.)
+# - Loads only relevant context
+# - Tracks work with unique IDs
+# - Generates reports on completion
+```
+
+#### Direct CLI Usage
+
+```bash
 # Manage concepts
 ctx concept list                    # List all concepts
 ctx concept new auth                # Create new concept
 ctx concept show auth                # View concept content
 
+# Start tasks with auto-detection
+ctx task start "Fix OAuth bug"      # Auto-detects concepts & report type
+ctx task start "Fix OAuth bug" -c auth,debugging  # Manual concept selection
+
 # Manage tasks
-ctx task start "Fix OAuth bug" -c auth,debugging
 ctx task list                       # View recent tasks
 ctx task show <id>                  # Inspect task details
 ctx task resume <id>                # Resume session
 ctx task fork <id> "Try new approach"  # Fork from task
 
-# Check status
-ctx status                          # Overall project status
-ctx task status                     # All task statuses
+# Generate reports
+ctx task report <id>                # Generate task report
+ctx task report-list                # List available templates
+```
+
+## The ContextualizeAgent
+
+### How It Works
+
+The ContextualizeAgent is a specialized Claude Code agent that brings intelligent context management to your development workflow:
+
+1. **Smart Context Detection**: Analyzes your task description to identify relevant concepts
+   - "Fix authentication bug" → loads `auth`, `security`, `core` concepts
+   - "Refactor database queries" → loads `database`, `sql`, `core` concepts
+
+2. **Automatic Task Management**: Every task gets:
+   - Unique ID for tracking
+   - Isolated Claude session
+   - Only the concepts it needs
+   - Automatic report generation
+
+3. **Seamless Integration**: Works as a native Task subagent
+   - Invoked via `/contextualize` command
+   - Or by asking Claude to "use ContextualizeAgent"
+   - Runs asynchronously like any Task
+
+### The Workflow
+
+```
+User: "/contextualize implement OAuth2 flow"
+         ↓
+ContextualizeAgent:
+  1. Discovers available concepts (auth, oauth, security, etc.)
+  2. Detects this is a "feature" task
+  3. Runs: ctx task start "implement OAuth2 flow" --concepts auth,oauth,core --report feature
+         ↓
+Contextualize Framework:
+  - Creates task 8f3d2a
+  - Loads only auth, oauth, core concepts
+  - Launches Claude with focused context
+  - Tracks all work in logs/8f3d2a/
+  - Generates feature report on completion
 ```
 
 ## Core Concepts
@@ -290,15 +348,20 @@ This is an early POC demonstrating active context engineering. Expect rough edge
 
 ### Working Features ✅
 
-- Basic task launching and tracking
-- Concept organization and loading
-- DAG visualization
-- Session fork and resume
-- CLI interface
+- **ContextualizeAgent for Claude Code** - Smart context-aware task execution
+- **Auto-detection** - Automatically identifies needed concepts and report types
+- **Task launching and tracking** - Every task gets a unique ID and session
+- **Concept organization** - Modular, reusable knowledge management
+- **Report generation** - Automatic task documentation
+- **DAG visualization** - Interactive task relationship viewer
+- **Session fork and resume** - Time travel through task history
+- **Comprehensive CLI** - Full control via `ctx` commands
+- **Machine-readable outputs** - `--porcelain` mode for agent integration
 
 ### In Development 🚧
 
-- Full MCP server integration
+- SDK-based agent enhancements
+- Parallel task execution
 - Better async execution
 - Concept auto-discovery
 - Cloud persistence
