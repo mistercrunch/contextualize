@@ -46,11 +46,46 @@ def task_start(
     context: str = typer.Option("", "--context", help="Additional context"),
     report: bool = typer.Option(False, "--report", "-r", help="Generate report after completion"),
     report_template: str = typer.Option(None, "--report-template", help="Report template to use"),
+    auto_detect: bool = typer.Option(
+        True, "--auto-detect/--no-auto-detect", help="Auto-detect concepts"
+    ),
+    validate: bool = typer.Option(True, "--validate/--no-validate", help="Validate concepts exist"),
 ):
     """Start a new task with focused context"""
+    from .concept_models import ConceptCollection
     from .launcher import launch_task
 
+    # Parse provided concepts
     concepts_list = [c.strip() for c in concepts.split(",") if c.strip()]
+
+    # Auto-detect concepts if enabled and none provided
+    if auto_detect and not concepts_list:
+        detected = detect_concepts_from_description(description)
+        if detected:
+            console.print(f"[dim]Auto-detected concepts: {', '.join(detected)}[/dim]")
+            concepts_list = detected
+
+    # Validate concepts exist if enabled
+    if validate and concepts_list:
+        collection = ConceptCollection()
+        available = {c.name for c in collection.list()}
+        missing = []
+
+        for concept in concepts_list:
+            if concept not in available:
+                missing.append(concept)
+
+        if missing:
+            console.print(f"[red]Error: Concepts not found: {', '.join(missing)}[/red]")
+            console.print("[yellow]Available concepts:[/yellow]")
+            for concept in sorted(available):
+                console.print(f"  - {concept}")
+            raise typer.Exit(1)
+
+    # Auto-detect report template if not specified
+    if report and not report_template:
+        report_template = detect_report_template(description)
+        console.print(f"[dim]Auto-selected report template: {report_template}[/dim]")
 
     task_id = launch_task(
         description=description,
@@ -62,6 +97,48 @@ def task_start(
     )
 
     return task_id
+
+
+def detect_concepts_from_description(description: str) -> list[str]:
+    """Smart concept detection from task description"""
+    keyword_map = {
+        "auth": ["login", "authentication", "auth", "user", "password", "session", "jwt", "oauth"],
+        "database": ["database", "sql", "query", "table", "db", "postgres", "mysql", "migration"],
+        "api": ["api", "endpoint", "rest", "graphql", "request", "response", "route"],
+        "testing": ["test", "testing", "spec", "coverage", "unit", "integration", "e2e"],
+        "security": ["security", "encryption", "hash", "csrf", "xss", "vulnerability"],
+        "frontend": ["ui", "frontend", "react", "vue", "component", "style", "css"],
+    }
+
+    description_lower = description.lower()
+    matched = set()
+
+    for concept, keywords in keyword_map.items():
+        if any(keyword in description_lower for keyword in keywords):
+            matched.add(concept)
+
+    # Always include core as baseline
+    matched.add("core")
+
+    return sorted(matched)
+
+
+def detect_report_template(description: str) -> str:
+    """Detect appropriate report template from task description"""
+    description_lower = description.lower()
+
+    if any(word in description_lower for word in ["fix", "bug", "issue", "error", "broken"]):
+        return "bug-fix"
+    elif any(
+        word in description_lower for word in ["implement", "add", "create", "feature", "new"]
+    ):
+        return "feature"
+    elif any(
+        word in description_lower for word in ["research", "investigate", "analyze", "explore"]
+    ):
+        return "research"
+    else:
+        return "default"
 
 
 @task_app.command("list")
@@ -291,6 +368,60 @@ def task_remove(
         console.print("[red]Failed to remove task[/red]")
 
 
+@task_app.command("report-list")
+def task_report_list(
+    porcelain: bool = typer.Option(False, "--porcelain", help="Machine-readable output"),
+):
+    """List available report templates"""
+    from pathlib import Path
+
+    # Check both user and package templates
+    user_reports_dir = Path("context/reports")
+    templates = []
+
+    if user_reports_dir.exists():
+        for template_file in user_reports_dir.glob("*.md"):
+            # Read first few lines to get description if available
+            content = template_file.read_text()
+            lines = content.split("\n")
+            description = lines[0].replace("#", "").strip() if lines else template_file.stem
+            templates.append({"name": template_file.stem, "description": description})
+
+    # Add default templates if not present
+    default_templates = [
+        {"name": "default", "description": "Standard task report"},
+        {"name": "bug-fix", "description": "Bug fix documentation"},
+        {"name": "feature", "description": "New feature documentation"},
+        {"name": "research", "description": "Research and analysis report"},
+    ]
+
+    # Merge with defaults (user templates override)
+    template_names = {t["name"] for t in templates}
+    for default in default_templates:
+        if default["name"] not in template_names:
+            templates.append(default)
+
+    if not templates:
+        if not porcelain:
+            console.print("[yellow]No report templates found.[/yellow]")
+        return
+
+    if porcelain:
+        # Machine-readable format: name:description
+        for template in templates:
+            print(f"{template['name']}:{template['description']}")
+    else:
+        # Human-readable table
+        table = Table(title="Available Report Templates")
+        table.add_column("Template", style="cyan")
+        table.add_column("Description", style="white")
+
+        for template in templates:
+            table.add_row(template["name"], template["description"])
+
+        console.print(table)
+
+
 @task_app.command("report")
 def task_report(
     task_id: str = typer.Argument(..., help="Task ID to generate report for"),
@@ -379,7 +510,9 @@ app.add_typer(concept_app, name="concept", rich_help_panel="Core Commands")
 
 
 @concept_app.command("list")
-def concept_list():
+def concept_list(
+    porcelain: bool = typer.Option(False, "--porcelain", help="Machine-readable output"),
+):
     """List all concepts"""
     from .concept_models import ConceptCollection
 
@@ -387,19 +520,30 @@ def concept_list():
     concepts = collection.list()
 
     if not concepts:
-        console.print("[yellow]No concepts found. Run `ctx init` first.[/yellow]")
+        if porcelain:
+            # Silent for machine parsing
+            pass
+        else:
+            console.print("[yellow]No concepts found. Run `ctx init` first.[/yellow]")
         return
 
-    table = Table(title="Available Concepts")
-    table.add_column("Concept", style="cyan")
-    table.add_column("Size", style="dim")
-    table.add_column("References", style="dim")
+    if porcelain:
+        # Machine-readable format: name:refs:size
+        for concept in concepts:
+            refs_str = ",".join(concept.references) if concept.references else ""
+            print(f"{concept.name}:{refs_str}:{concept.get_size()}")
+    else:
+        # Human-readable table
+        table = Table(title="Available Concepts")
+        table.add_column("Concept", style="cyan")
+        table.add_column("Size", style="dim")
+        table.add_column("References", style="dim")
 
-    for concept in concepts:
-        refs_str = ", ".join(concept.references) if concept.references else "-"
-        table.add_row(concept.name, f"{concept.get_size():,} chars", refs_str)
+        for concept in concepts:
+            refs_str = ", ".join(concept.references) if concept.references else "-"
+            table.add_row(concept.name, f"{concept.get_size():,} chars", refs_str)
 
-    console.print(table)
+        console.print(table)
 
 
 @concept_app.command("show")
@@ -631,6 +775,85 @@ Add key information that many tasks will need.
     else:
         gitignore.write_text("# Contextualize\nlogs/\n\n# Claude Code\n.claude/\n")
         console.print("✅ Created .gitignore")
+
+    # Ask about ContextualizeAgent installation
+    console.print("\n[bold]Claude Code Integration[/bold]")
+    install_agent = typer.confirm(
+        "Install ContextualizeAgent for Claude Code integration?", default=True
+    )
+
+    if install_agent:
+        # Determine installation location
+        project_claude = Path(".claude")
+        home_claude = Path.home() / ".claude"
+
+        location_choice = typer.prompt(
+            "Install location", type=typer.Choice(["project", "global"]), default="project"
+        )
+
+        target_base = project_claude if location_choice == "project" else home_claude
+
+        # Install agent
+        agent_dir = target_base / "agents" / "contextualize"
+        agent_dir.mkdir(parents=True, exist_ok=True)
+
+        try:
+            # Copy agent resources
+            agent_resources = resources.files("contextualize.resources.agents.contextualize")
+            for resource in agent_resources.iterdir():
+                target = agent_dir / resource.name
+                target.write_text(resource.read_text())
+                console.print(f"✅ Installed agent file: {resource.name}")
+
+            # Install slash command
+            command_dir = target_base / "commands"
+            command_dir.mkdir(parents=True, exist_ok=True)
+            command_resource = resources.files("contextualize.resources.commands").joinpath(
+                "contextualize.md"
+            )
+            command_target = command_dir / "contextualize.md"
+            command_target.write_text(command_resource.read_text())
+            console.print("✅ Installed /contextualize command")
+
+            # Update instructions.md
+            instructions_file = target_base / "instructions.md"
+            instructions_content = ""
+            if instructions_file.exists():
+                instructions_content = instructions_file.read_text()
+
+            contextualize_instructions = """
+
+## Contextualize Framework
+
+This project uses the Contextualize framework for context-aware task execution.
+
+For substantial development tasks, use the ContextualizeAgent:
+- Use `/contextualize [task description]` for the slash command
+- Or use `Task(subagent_type="contextualize", prompt="...")` directly
+- The agent will automatically load relevant concepts and track work
+
+Available commands:
+- `ctx task list` - View all tasks
+- `ctx concept list` - View available concepts
+- `ctx task show [id]` - View task details
+"""
+
+            if "ContextualizeAgent" not in instructions_content:
+                instructions_file.write_text(instructions_content + contextualize_instructions)
+                console.print("✅ Updated Claude instructions")
+
+            console.print(
+                f"\n[green]ContextualizeAgent installed in {location_choice} location![/green]"
+            )
+            console.print(
+                "[dim]Use /contextualize command or Task with subagent_type='contextualize'[/dim]"
+            )
+
+        except Exception as e:
+            console.print(f"[yellow]Could not install agent (resources not found: {e})[/yellow]")
+            console.print(
+                "[dim]Agent files can be manually copied from contextualize/resources/[/dim]"
+            )
 
     console.print("[bold green]Contextualize initialized![/bold green]")
     console.print("\nDirectory structure:")

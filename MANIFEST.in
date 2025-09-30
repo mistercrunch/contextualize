@@ -9,6 +9,10 @@ recursive-include contextualize/resources *.md *.json *.yaml *.yml
 # Include templates
 recursive-include contextualize/resources/templates *
 
+# Include agent and command resources
+recursive-include contextualize/resources/agents *
+recursive-include contextualize/resources/commands *
+
 # Exclude Python cache
 global-exclude __pycache__
 global-exclude *.py[co]
